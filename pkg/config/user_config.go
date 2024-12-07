@@ -502,6 +502,7 @@ type KeybindingAmendAttributeConfig struct {
 	ResetAuthor string `yaml:"resetAuthor"`
 	SetAuthor   string `yaml:"setAuthor"`
 	AddCoAuthor string `yaml:"addCoAuthor"`
+	AddGitmoji  string `yaml:"addCoAuthor"`
 }
 
 type KeybindingStashConfig struct {
@@ -938,6 +939,7 @@ func GetDefaultConfig() *UserConfig {
 				ResetAuthor: "a",
 				SetAuthor:   "A",
 				AddCoAuthor: "c",
+				AddGitmoji:  "g",
 			},
 			Stash: KeybindingStashConfig{
 				PopStash:    "g",

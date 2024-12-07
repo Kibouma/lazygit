@@ -256,81 +256,7 @@ func (self *CommitsHelper) addCoAuthor(suggestionFunc func(string) []*types.Sugg
 }
 
 func (self *CommitsHelper) gitmojiSuggestions() func(string) []*types.Suggestion {
-	mojis := []string{
-		"➕ Add a dependency",
-		"🧪 Add a failing test",
-		"👷 Add or update CI build system",
-		"🙈 Add or update a .gitignore file",
-		"🥚 Add or update an easter egg",
-		"📈 Add or update analytics or track code",
-		"💫 Add or update animations and transitions",
-		"🍱 Add or update assets",
-		"👔 Add or update business logic",
-		"🧵 Add or update code related to multithreading or concurrency",
-		"🦺 Add or update code related to validation",
-		"💡 Add or update comments in source code",
-		"📦️ Add or update compiled files or packages",
-		"🔧 Add or update configuration files",
-		"👥 Add or update contributor(s)",
-		"🔨 Add or update development scripts",
-		"📝 Add or update documentation",
-		"🩺 Add or update healthcheck",
-		"📄 Add or update license",
-		"🔊 Add or update logs",
-		"🔐 Add or update secrets",
-		"🌱 Add or update seed files",
-		"📸 Add or update snapshots",
-		"💬 Add or update text and literals",
-		"💄 Add or update the UI and style files",
-		"🏷️ Add or update types",
-		"💸 Add sponsorships or money related infrastructure",
-		"✅ Add, update, or pass tests",
-		"🚩 Add, update, or remove feature flags",
-		"🎉 Begin a project",
-		"🥅 Catch errors",
-		"🚑️ Critical hotfix",
-		"🧐 Data exploration/inspection",
-		"🚀 Deploy stuff",
-		"🗑️ Deprecate code that needs to be cleaned up",
-		"⬇️ Downgrade dependencies",
-		"💚 Fix CI Build",
-		"🐛 Fix a bug",
-		"🚨 Fix compiler / linter warnings",
-		"🔒️ Fix security or privacy issues",
-		"✏️ Fix typos",
-		"🔍️ Improve SEO",
-		"♿️ Improve accessibility",
-		"🧑‍💻 Improve developer experience",
-		"⚡️ Improve performance",
-		"🎨 Improve structure / format of the code",
-		"🚸 Improve user experience / usability",
-		"🧱 Infrastructure related changes",
-		"🌐 Internationalization and localization",
-		"💥 Introduce breaking changes",
-		"✨ Introduce new features",
-		"🏗️ Make architectural changes",
-		"🔀 Merge branches",
-		"🤡 Mock things",
-		"🚚 Move or rename resources (e.g.: files, paths, routes)",
-		"🗃️ Perform database related changes",
-		"⚗️ Perform experiments",
-		"📌 Pin dependencies to specific versions",
-		"♻️ Refactor code",
-		"🔖 Release / Version tags",
-		"➖ Remove a dependency",
-		"🔥 Remove code or files",
-		"⚰️ Remove dead code",
-		"🔇 Remove logs",
-		"⏪️ Revert changes",
-		"🩹 Simple fix for a non-critical issue",
-		"👽️ Update code due to external API changes",
-		"⬆️ Upgrade dependencies",
-		"🚧 Work in progress",
-		"🛂 Work on code related to authorization, roles and permissions",
-		"📱 Work on responsive design",
-		"💩 Write bad code that needs to be improved",
-		"🍻 Write code drunkenly",
-	}
+	mojis := utils.GetGitmojiActions()
 	return func(input string) []*types.Suggestion {
 		var matches []string
 		if input == "" {
@@ -342,57 +268,6 @@ func (self *CommitsHelper) gitmojiSuggestions() func(string) []*types.Suggestion
 	}
 }
 
-// isEmoji checks if the rune belongs to known emoji Unicode ranges
-func isEmoji(value string) bool {
-	if len(value) > 1 {
-		if uniseg.GraphemeClusterCount(value) == 1 {
-			return true
-		}
-	}
-	r := rune(value[0])
-	// Emoji ranges defined by Unicode
-	// Emoticons (0x1F600-0x1F64F)
-	if r >= 0x1F600 && r <= 0x1F64F {
-		return true
-	}
-	// Miscellaneous Symbols and Pictographs (0x1F300-0x1F5FF)
-	if r >= 0x1F300 && r <= 0x1F5FF {
-		return true
-	}
-	// Transport and Map Symbols (0x1F680-0x1F6FF)
-	if r >= 0x1F680 && r <= 0x1F6FF {
-		return true
-	}
-	// Supplemental Symbols and Pictographs (0x1F900-0x1F9FF)
-	if r >= 0x1F900 && r <= 0x1F9FF {
-		return true
-	}
-	// Miscellaneous Symbols (0x2600-0x26FF)
-	if r >= 0x2600 && r <= 0x26FF {
-		return true
-	}
-	// Dingbats (0x2700-0x27BF)
-	if r >= 0x2700 && r <= 0x27BF {
-		return true
-	}
-	// Other known emoji-related ranges could be added here.
-	// For example, flags, family emojis, and emoji modifiers are also valid.
-
-	// Check if the character is a regional indicator letter (flags)
-	if r >= 0x1F1E6 && r <= 0x1F1FF {
-		return true
-	}
-
-	// Check if the character is part of the variation selector (VS) range (emoji modifiers)
-	if r >= 0xFE00 && r <= 0xFE0F {
-		return true
-	}
-
-	// Some other characters like emoji modifiers might also qualify as part of an emoji
-	// Return false if the character is not part of any known emoji block
-	return false
-}
-
 func (self *CommitsHelper) addGitmoji() error {
 	self.c.Prompt(types.PromptOpts{
 		Title:               self.c.Tr.AddGitmojiPromptTitle,
@@ -401,20 +276,20 @@ func (self *CommitsHelper) addGitmoji() error {
 			if len(value) == 0 {
 				return nil
 			}
-			commitDescription := self.getCommitSummary()
-			currentGitmoji, rest, _, _ := uniseg.FirstGraphemeClusterInString(commitDescription, -1)
-			gitmoji, _, _, _ := uniseg.FirstGraphemeClusterInString(value, -1)
-			// If no emoji was directly selected, choose the first suggestion
-			if !isEmoji(gitmoji) {
-				suggestions := self.gitmojiSuggestions()(value)
-				gitmoji, _, _, _ = uniseg.FirstGraphemeClusterInString(suggestions[0].Label, -1)
+			// Always choose a suggestion
+			suggestions := self.gitmojiSuggestions()(value)
+			if len(suggestions) < 1 {
+				return nil
 			}
-			if len(currentGitmoji) > 0 && isEmoji(currentGitmoji) {
-				commitDescription = gitmoji + rest
+			gitmoji := utils.GetGitmojiByLabel(suggestions[0].Label)
+			commitSummary := self.getCommitSummary()
+			currentGitmoji, rest, _, _ := uniseg.FirstGraphemeClusterInString(commitSummary, -1)
+			if len(currentGitmoji) > 0 && utils.IsGitmoji(currentGitmoji) {
+				commitSummary = gitmoji + rest
 			} else {
-				commitDescription = gitmoji + commitDescription + currentGitmoji
+				commitSummary = gitmoji + commitSummary + currentGitmoji
 			}
-			self.setCommitSummary(commitDescription)
+			self.setCommitSummary(commitSummary)
 			return nil
 		},
 	})

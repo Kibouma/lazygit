@@ -119,6 +119,9 @@ type GuiConfig struct {
 	ShowPanelJumps bool `yaml:"showPanelJumps"`
 	// Deprecated: use nerdFontsVersion instead
 	ShowIcons bool `yaml:"showIcons"`
+	// If true, show composite emoji gitmojis
+	// Might break the display on some terminals
+	ShowMultiCharacterGitmojis bool `yaml:"showMultiCharacterGitmojis"`
 	// Nerd fonts version to use.
 	// One of: '2' | '3' | empty string (default)
 	// If empty, do not show icons.

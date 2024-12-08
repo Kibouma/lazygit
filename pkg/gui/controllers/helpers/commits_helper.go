@@ -253,33 +253,38 @@ func (self *CommitsHelper) addCoAuthor(suggestionFunc func(string) []*types.Sugg
 	return nil
 }
 
-func (self *CommitsHelper) gitmojiSuggestions() func(string) []*types.Suggestion {
-	mojis := utils.GetGitmojiActions()
+func (self *CommitsHelper) getGitmojiSuggestions() func(string) []*types.Suggestion {
+	showMultiCharacter := self.c.UserConfig().Gui.ShowMultiCharacterGitmojis
 	return func(input string) []*types.Suggestion {
 		var matches []string
 		if input == "" {
-			matches = mojis
+			matches = utils.GetGitmojiActions(showMultiCharacter)
 		} else {
-			matches = utils.FilterStrings(input, mojis, true)
+			matches = utils.FilterStrings(input, utils.GetGitmojiActions(showMultiCharacter), true)
 		}
-		return matchesToSuggestions(matches)
+		return lo.Map(matches, func(match string, _ int) *types.Suggestion {
+			return &types.Suggestion{
+				Value: match,
+				Label: utils.GetGitmojiByLabel(match) + " " + match,
+			}
+		})
 	}
 }
 
 func (self *CommitsHelper) addGitmoji() error {
 	self.c.Prompt(types.PromptOpts{
 		Title:               self.c.Tr.AddGitmojiPromptTitle,
-		FindSuggestionsFunc: self.gitmojiSuggestions(),
+		FindSuggestionsFunc: self.getGitmojiSuggestions(),
 		HandleConfirm: func(value string) error {
 			if len(value) == 0 {
 				return nil
 			}
 			// Always choose a suggestion
-			suggestions := self.gitmojiSuggestions()(value)
+			suggestions := self.getGitmojiSuggestions()(value)
 			if len(suggestions) < 1 {
 				return nil
 			}
-			gitmoji := utils.GetGitmojiByLabel(suggestions[0].Label)
+			gitmoji := utils.GetGitmojiByLabel(suggestions[0].Value)
 			commitSummary := self.getCommitSummary()
 			currentGitmoji, rest, _, _ := uniseg.FirstGraphemeClusterInString(commitSummary, -1)
 			if len(currentGitmoji) > 0 && utils.IsGitmoji(currentGitmoji) {

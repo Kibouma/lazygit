@@ -1,6 +1,9 @@
 package utils
 
-import "github.com/samber/lo"
+import (
+	"github.com/rivo/uniseg"
+	"github.com/samber/lo"
+)
 
 type Gitmoji struct {
 	Emoji string
@@ -83,8 +86,16 @@ var gitmojis = []Gitmoji{
 	{Emoji: "🍻", Label: "Write code drunkenly"},
 }
 
-func GetGitmojiActions() []string {
-	return lo.Map(gitmojis, func(g Gitmoji, i int) string {
+func GetGitmojiActions(ShowMultiCharacterGitmojis bool) []string {
+	mojis := lo.Filter(gitmojis, func(g Gitmoji, _ int) bool {
+		if ShowMultiCharacterGitmojis {
+			return true
+		}
+		it := uniseg.NewGraphemes(g.Emoji)
+		it.Next()
+		return len(it.Runes()) <= 1
+	})
+	return lo.Map(mojis, func(g Gitmoji, i int) string {
 		return g.Label
 	})
 }

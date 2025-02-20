@@ -96,7 +96,7 @@ func GetGitmojiActions(ShowMultiCharacterGitmojis bool) []string {
 		return len(it.Runes()) <= 1
 	})
 	return lo.Map(mojis, func(g Gitmoji, i int) string {
-		return g.Label
+		return g.Label // + "," + strconv.Itoa(uniseg.GraphemeClusterCount(g.Emoji)) + "," + strconv.Itoa(len([]rune(g.Emoji)))
 	})
 }
 

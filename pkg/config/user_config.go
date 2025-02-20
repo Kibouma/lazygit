@@ -133,7 +133,7 @@ type GuiConfig struct {
 	ShowIcons bool `yaml:"showIcons"`
 	// If true, show composite emoji gitmojis
 	// Might break the display on some terminals
-	ShowMultiCharacterGitmojis bool `yaml:"showMultiCharacterGitmojis"`
+	HideMultiCharacterGitmojis bool `yaml:"hideMultiCharacterGitmojis"`
 	// Nerd fonts version to use.
 	// One of: '2' | '3' | empty string (default)
 	// If empty, do not show icons.

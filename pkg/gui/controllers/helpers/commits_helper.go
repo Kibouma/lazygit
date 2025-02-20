@@ -256,7 +256,7 @@ func (self *CommitsHelper) addCoAuthor(suggestionFunc func(string) []*types.Sugg
 }
 
 func (self *CommitsHelper) getGitmojiSuggestions() func(string) []*types.Suggestion {
-	showMultiCharacter := self.c.UserConfig().Gui.ShowMultiCharacterGitmojis
+	showMultiCharacter := !self.c.UserConfig().Gui.HideMultiCharacterGitmojis
 	return func(input string) []*types.Suggestion {
 		var matches []string
 		if input == "" {

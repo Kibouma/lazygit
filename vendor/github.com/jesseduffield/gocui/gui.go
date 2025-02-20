@@ -15,6 +15,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/go-errors/errors"
 	"github.com/mattn/go-runewidth"
+	"github.com/rivo/uniseg"
 )
 
 // OutputMode represents an output mode, which determines how colors
@@ -1085,7 +1086,7 @@ func (g *Gui) drawTitle(v *View, fgColor, bgColor Attribute) error {
 		if err := g.SetRune(x, v.y0, ch, fgColor, bgColor); err != nil {
 			return err
 		}
-		x += runewidth.RuneWidth(ch)
+		x += uniseg.StringWidth(string(ch))
 	}
 	for i, ch := range str {
 		if x < 0 {
@@ -1110,7 +1111,7 @@ func (g *Gui) drawTitle(v *View, fgColor, bgColor Attribute) error {
 		if err := g.SetRune(x, v.y0, ch, currentFgColor, currentBgColor); err != nil {
 			return err
 		}
-		x += runewidth.RuneWidth(ch)
+		x += uniseg.StringWidth(string(ch))
 	}
 	return nil
 }
@@ -1133,7 +1134,7 @@ func (g *Gui) drawSubtitle(v *View, fgColor, bgColor Attribute) error {
 		if err := g.SetRune(x, v.y0, ch, fgColor, bgColor); err != nil {
 			return err
 		}
-		x += runewidth.RuneWidth(ch)
+		x += uniseg.StringWidth(string(ch))
 	}
 	return nil
 }
@@ -1162,7 +1163,7 @@ func (g *Gui) drawListFooter(v *View, fgColor, bgColor Attribute) error {
 		if err := g.SetRune(x, v.y1, ch, fgColor, bgColor); err != nil {
 			return err
 		}
-		x += runewidth.RuneWidth(ch)
+		x += uniseg.StringWidth(string(ch))
 	}
 	return nil
 }

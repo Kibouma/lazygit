@@ -15,6 +15,7 @@ import (
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/mattn/go-runewidth"
+	"github.com/rivo/uniseg"
 )
 
 // Constants for overlapping edges
@@ -917,7 +918,7 @@ func (v *View) parseInput(ch rune, x int, _ int) (bool, []cell) {
 			v.ei.instructionRead()
 			cx := 0
 			for _, cell := range v.lines[v.wy][0:v.wx] {
-				cx += runewidth.RuneWidth(cell.chr)
+				cx += uniseg.StringWidth(string(cell.chr))
 			}
 			repeatCount = v.InnerWidth() - cx
 			ch = ' '
@@ -1104,7 +1105,7 @@ func (v *View) updateSearchPositions() {
 				if found {
 					result = append(result, SearchPosition{XStart: x, XEnd: x + searchStringWidth, Y: y})
 				}
-				x += runewidth.RuneWidth(c.chr)
+				x += uniseg.StringWidth(string(c.chr))
 			}
 			return result
 		}
@@ -1212,7 +1213,7 @@ func (v *View) draw() {
 
 			if x < 0 {
 				if cellIdx < len(vline.line) {
-					x += runewidth.RuneWidth(vline.line[cellIdx].chr)
+					x += uniseg.StringWidth(string(vline.line[cellIdx].chr))
 					cellIdx++
 					continue
 				} else {
@@ -1250,7 +1251,7 @@ func (v *View) draw() {
 
 			// Not sure why the previous code was here but it caused problems
 			// when typing wide characters in an editor
-			x += runewidth.RuneWidth(c.chr)
+			x += uniseg.StringWidth(string(c.chr))
 			cellIdx++
 		}
 	}
@@ -1505,7 +1506,7 @@ func lineWrap(line []cell, columns int) [][]cell {
 	lines := make([][]cell, 0, 1)
 	for i := range line {
 		currChr := line[i].chr
-		rw := runewidth.RuneWidth(currChr)
+		rw := uniseg.StringWidth(string(currChr))
 		n += rw
 		// if currChr == 'g' {
 		// 	panic(n)
@@ -1538,7 +1539,7 @@ func lineWrap(line []cell, columns int) [][]cell {
 				offset = lastWhitespaceIndex + 1
 				n = 0
 				for _, c := range line[offset : i+1] {
-					n += runewidth.RuneWidth(c.chr)
+					n += uniseg.StringWidth(string(c.chr))
 				}
 			} else {
 				// in this case we're breaking mid-word

@@ -3,7 +3,7 @@ package gocui
 import (
 	"strings"
 
-	"github.com/mattn/go-runewidth"
+	"github.com/rivo/uniseg"
 )
 
 const (
@@ -403,7 +403,7 @@ func (self *TextArea) GetCursorXY() (int, int) {
 			cursorY++
 			cursorX = 0
 		} else {
-			chWidth := runewidth.RuneWidth(r)
+			chWidth := uniseg.StringWidth(string(r))
 			cursorX += chWidth
 		}
 	}
@@ -438,7 +438,7 @@ func (self *TextArea) SetCursor2D(x int, y int) {
 			}
 			y--
 		} else if y == 0 {
-			chWidth := runewidth.RuneWidth(r)
+			chWidth := uniseg.StringWidth(string(r))
 			x -= chWidth
 		}
 
